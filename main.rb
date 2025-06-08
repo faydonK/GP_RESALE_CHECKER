@@ -5,7 +5,7 @@ include Win32
 
 # ---------------------------CONFIGURATION------------------------------------------
 
-BROWSER_PATH = 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe'
+BROWSER_PATH = ''
 TARGET_URL = 'https://gp-explorer.fr/billetterie/revente/'
 CHECK_TEXT = 'Aucun billet disponible pour le moment, veuillez essayer plus tard.'
 
