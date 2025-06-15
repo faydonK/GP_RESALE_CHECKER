@@ -1,11 +1,23 @@
 require 'selenium-webdriver'
-require 'win32/sound'
 require 'timeout'
-include Win32
+
+# Détection de l'OS
+def windows?
+  (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+end
+
+def macos?
+  (/darwin/ =~ RUBY_PLATFORM) != nil
+end
+
+if windows?
+  require 'win32/sound'
+  include Win32
+end
 
 # ---------------------------CONFIGURATION------------------------------------------
 
-BROWSER_PATH = ''
+BROWSER_PATH = 'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe'
 TARGET_URL = 'https://gp-explorer.fr/billetterie/revente/'
 CHECK_TEXT = 'Aucun billet disponible pour le moment, veuillez essayer plus tard.'
 
@@ -13,7 +25,7 @@ CHECK_TEXT = 'Aucun billet disponible pour le moment, veuillez essayer plus tard
 CYCLE_CHECKS = 20
 # --- AJUSTER LES CYCLE CHECKS EN FONCTION DU NOMBRE DE GENS DANS LA QUEUE ---
 
-REFRESH_DELAY = 2
+REFRESH_DELAY = 1
 TIMEOUT_SECONDS = 15
 
 # ---------------------------CONFIGURATION-------------------------------------------
@@ -77,7 +89,13 @@ end
 
 def play_alert
   4.times do
-    Sound.play('SystemExclamation')
+    if windows?
+      Sound.play('SystemExclamation')
+    elsif macos?
+      system("afplay /System/Library/Sounds/Glass.aiff")
+    else
+      puts "Alerte sonore non supportée sur cet OS."
+    end
     sleep 0.5
   end
 end
@@ -184,10 +202,7 @@ begin
     if message_detected
       puts "[#{Time.now.strftime('%H:%M:%S')}] Rafraichissement de la page..."
       driver.navigate.refresh
-      sleep 2
       accept_cookies(driver)
-      puts "[#{Time.now.strftime('%H:%M:%S')}] Pause 2s avant nouveau cycle..."
-      sleep 2
     else
       puts "\n[#{Time.now.strftime('%H:%M:%S')}] Billets probablement disponibles !"
       play_alert
